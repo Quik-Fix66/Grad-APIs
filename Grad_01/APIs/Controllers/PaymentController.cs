@@ -1,5 +1,4 @@
 ﻿using System;
-using APIs.DTO.Payment;
 using System.Net;
 using APIs.Services.Intefaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +8,7 @@ using APIs.Config;
 using Microsoft.AspNetCore.Http;
 using BusinessObjects.Models;
 using APIs.Utils.Extensions;
-
-
+using BusinessObjects.DTO;
 
 namespace APIs.Controllers
 {
@@ -28,7 +26,7 @@ namespace APIs.Controllers
         [Route("vnpay/create-vnpay-link")]
         //[ProducesResponseType(typeof(BaseResultWithData<PaymentLinkDtos>), 200)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult Create([FromBody] PaymentDTO request)
+        public IActionResult Create([FromBody] NewTransactionDTO request)
         {
             var response = new PaymentLinkDTO();                        
             response.PaymentId = DateTime.Now.Ticks.ToString();

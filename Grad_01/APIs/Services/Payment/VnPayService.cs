@@ -5,13 +5,13 @@ using System.Security.Cryptography;
 using APIs.Services.Intefaces;
 using APIs.Config;
 using Microsoft.Extensions.Options;
-using APIs.DTO.Payment;
 using APIs.Utils.Base.Models;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Azure;
 using Azure.Core;
 using Azure.Messaging;
 using Microsoft.Data.SqlClient;
+using BusinessObjects.DTO;
 
 namespace APIs.Services
 {
@@ -23,7 +23,7 @@ namespace APIs.Services
             _vnPayConfig = vnPayConfig.Value;
         }
 
-        public string NewTransaction(PaymentDTO paymentInfo)
+        public string NewTransaction(NewTransactionDTO paymentInfo)
         {
             VnPayRequestDTO requestDTO = new VnPayRequestDTO
             {
