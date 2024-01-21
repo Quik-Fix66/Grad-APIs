@@ -35,22 +35,25 @@ namespace APIs.Controllers
         }
 
         [HttpGet]
-        [Route("vnpay/vnpay-return")]
+        [Route("VnPayIPN")]
         public IActionResult VnpayReturn([FromQuery] VnPayResponseDTO response)
         {
             string returnUrl = string.Empty;
             var returnModel = new PaymentReturnDTO();
-            var processResult =  _vnpService.ProcessVnPayReturn(response);
-
+            var processResult = _vnpService.ProcessVnPayReturn(response);
+            
             if (processResult.Success)
             {
-                //returnModel = processResult.Data.Item1;
+                returnModel = processResult.Data.Item1;
                 returnUrl = processResult.Data.Item2;
             }
-
-            if (returnUrl.EndsWith("/"))
-                returnUrl = returnUrl.Remove(returnUrl.Length - 1, 1);
-            return Redirect($"{returnUrl}?{returnModel.ToQueryString()}");
+                returnModel = processResult.Data.Item1;
+                returnUrl = processResult.Data.Item2;
+            //if (returnUrl.EndsWith("/"))
+            //    returnUrl = returnUrl.Remove(returnUrl.Length - 1, 1);
+            return BadRequest(returnModel);
+            //processResult.Errors.Where(e => e.Code == "Exeption").FirstOrDefault().Message)
+            //return Redirect($"{returnUrl}?{returnModel.ToQueryString()}");
         }
 
         //public async Task<IActionResult> VnPayIpnReturn([FromQuery] VnPayResponseDTO response)

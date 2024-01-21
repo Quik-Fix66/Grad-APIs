@@ -12,17 +12,18 @@ namespace BusinessObjects.Models.Ecom
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid OrderId { get; set; }
 		public Guid CustomerId { get; set; }
-		public decimal Total_Price { get; set; }
+		public decimal? Total_Price { get; set; }
 		public string? Status { get; set; }
 
 		public int Quantity { get; set; }
 		public string? Notes { get; set; }
 		public DateTime CreatedDate { get; set; }
-		public Guid PaymentId { get; set; }
+		//public Guid PaymentId { get; set; }
 		public Guid? AddressId { get; set; }
 
-		[ForeignKey("PaymentId"), JsonIgnore]
-        public virtual PaymentDetails? Payment { get; set; }
+
+		//[ForeignKey("PaymentId"), JsonIgnore]
+  //      public virtual PaymentDetails? Payment { get; set; }
 		[ForeignKey("AddressId"), JsonIgnore]
 		public virtual Address? Address { get; set; }
 

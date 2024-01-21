@@ -39,7 +39,7 @@ namespace BusinessObjects.DTO
 
     public class VnPayResponseDTO
     {
-        public decimal vnp_Amount { get; set; }
+        public decimal? vnp_Amount { get; set; }
 
         public string vnp_BankCode { get; set; } = string.Empty;
 

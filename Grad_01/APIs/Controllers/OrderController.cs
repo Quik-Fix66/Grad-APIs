@@ -1,5 +1,7 @@
 ﻿using System;
 using APIs.Repositories.Interfaces;
+using APIs.Services.Intefaces;
+using BusinessObjects.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIs.Controllers
@@ -8,23 +10,39 @@ namespace APIs.Controllers
 	[ApiController]
 	public class OrderController : ControllerBase
 	{
-		public IBookRepository _bookRepo;
-
-		public OrderController(IBookRepository bookRepo)
+		private readonly IOrderService _orderService;
+		public OrderController(IOrderService orderService)
 		{
-			_bookRepo = bookRepo;
+			_orderService = orderService;
 		}
 
-		//
-		//Create order (CartToOrderDTO)
-		//
-		//[HttpPost]
-		//[Route("create-order")]
-		//public IActionResult CreateOrder([FromBody] CartToOrderDTO data)
-		//{
+		[HttpPost]
+		[Route("create-order")]
+		public IActionResult CreateOrder([FromBody] PaymentReturnDTO data, Guid customerId, Guid addressId)
+		{
+			Guid orderId = Guid.NewGuid();
+			NewOrderDTO dto = new NewOrderDTO()
+			{
+				OrderId = orderId,
+				CustomerId = customerId,
+				Status = data.PaymentStatus,
+				Notes = data.PaymentMessage,
+				PaymentId = Guid.Parse(data.PaymentId),
+				AddressId = addressId,
+			};
+            string result = _orderService.CreateNewOrder(dto);
 
-		//}
-		
+            if (result == "Successfully!")
+			{
+                //string result2 = _orderService.TakeProductFromCart(customerId, orderId);
+
+    //            if (result2 == "Successfully!")
+				//{
+					return Ok("Successfully!");
+				//} return BadRequest(result2);
+			} return BadRequest(result);
+		}
+
 	}
 }
 
