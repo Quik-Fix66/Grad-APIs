@@ -26,36 +26,4 @@
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="Mapper\" />
-    <None Remove="Services\" />
-    <None Remove="Services\Payment\" />
-    <None Remove="Repositories\" />
-    <None Remove="Repositories\Interfaces\" />
-    <None Remove="Utils\" />
-    <None Remove="Utils\Config\" />
-    <None Remove="Utils\Base\" />
-    <None Remove="Utils\Base\Models\" />
-    <None Remove="Utils\Extensions\" />
-    <None Remove="Utils\VnPay\" />
-    <None Remove="Utils\Paging\" />
-    <None Remove="FileSystem\" />
-    <None Remove="Services\Interfaces\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mapper\" />
-    <Folder Include="Services\" />
-    <Folder Include="Services\Payment\" />
-    <Folder Include="Repositories\" />
-    <Folder Include="Repositories\Interfaces\" />
-    <Folder Include="Utils\" />
-    <Folder Include="Utils\Config\" />
-    <Folder Include="Utils\Base\" />
-    <Folder Include="Utils\Base\Models\" />
-    <Folder Include="Utils\Extensions\" />
-    <Folder Include="Utils\VnPay\" />
-    <Folder Include="Utils\Paging\" />
-    <Folder Include="FileSystem\" />
-    <Folder Include="Services\Interfaces\" />
-  </ItemGroup>
 </Project>
