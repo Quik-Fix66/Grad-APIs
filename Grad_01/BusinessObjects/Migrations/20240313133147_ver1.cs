@@ -54,17 +54,16 @@ namespace BusinessObjects.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    PaymentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentRefId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Signature = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transactions", x => x.PaymentId);
+                    table.PrimaryKey("PK_Transactions", x => x.TransactionId);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,7 +72,6 @@ namespace BusinessObjects.Migrations
                 {
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Quantity = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -215,32 +213,6 @@ namespace BusinessObjects.Migrations
                     table.ForeignKey(
                         name: "FK_CICMedias_AppUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AppUsers",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PaymentDetails",
-                columns: table => new
-                {
-                    PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RequiredAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Language = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MerchantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PaymentGate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastMessage = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PaymentDetails", x => x.PaymentId);
-                    table.ForeignKey(
-                        name: "FK_PaymentDetails_AppUsers_MerchantId",
-                        column: x => x.MerchantId,
                         principalTable: "AppUsers",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
@@ -391,9 +363,11 @@ namespace BusinessObjects.Migrations
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Total_Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -404,6 +378,11 @@ namespace BusinessObjects.Migrations
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "AddressId");
+                    table.ForeignKey(
+                        name: "FK_Orders_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
+                        principalColumn: "TransactionId");
                 });
 
             migrationBuilder.CreateTable(
@@ -437,24 +416,23 @@ namespace BusinessObjects.Migrations
                     SubRecordId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BillingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SubscriptionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EventType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    EventType = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SubRecords", x => x.SubRecordId);
-                    table.ForeignKey(
-                        name: "FK_SubRecords_PaymentDetails_BillingId",
-                        column: x => x.BillingId,
-                        principalTable: "PaymentDetails",
-                        principalColumn: "PaymentId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SubRecords_Subscriptions_SubscriptionId",
                         column: x => x.SubscriptionId,
                         principalTable: "Subscriptions",
                         principalColumn: "SubId",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SubRecords_Transactions_BillingId",
+                        column: x => x.BillingId,
+                        principalTable: "Transactions",
+                        principalColumn: "TransactionId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -591,9 +569,9 @@ namespace BusinessObjects.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PaymentDetails_MerchantId",
-                table: "PaymentDetails",
-                column: "MerchantId");
+                name: "IX_Orders_TransactionId",
+                table: "Orders",
+                column: "TransactionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_UserId",
@@ -675,9 +653,6 @@ namespace BusinessObjects.Migrations
                 name: "TokenInfos");
 
             migrationBuilder.DropTable(
-                name: "Transactions");
-
-            migrationBuilder.DropTable(
                 name: "Carts");
 
             migrationBuilder.DropTable(
@@ -696,13 +671,13 @@ namespace BusinessObjects.Migrations
                 name: "Books");
 
             migrationBuilder.DropTable(
-                name: "PaymentDetails");
-
-            migrationBuilder.DropTable(
                 name: "Subscriptions");
 
             migrationBuilder.DropTable(
                 name: "Addresses");
+
+            migrationBuilder.DropTable(
+                name: "Transactions");
 
             migrationBuilder.DropTable(
                 name: "Ratings");

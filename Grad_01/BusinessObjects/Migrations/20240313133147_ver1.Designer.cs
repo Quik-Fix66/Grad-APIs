@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObjects.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240306095429_ver1")]
+    [Migration("20240313133147_ver1")]
     partial class ver1
     {
         /// <inheritdoc />
@@ -154,9 +154,6 @@ namespace BusinessObjects.Migrations
                     b.Property<DateTime?>("PublishDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<Guid?>("RatingId")
                         .HasColumnType("uniqueidentifier");
 
@@ -236,10 +233,6 @@ namespace BusinessObjects.Migrations
 
                     b.Property<Guid>("SubscriptionId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SubRecordId");
 
@@ -422,6 +415,10 @@ namespace BusinessObjects.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -431,57 +428,23 @@ namespace BusinessObjects.Migrations
                     b.Property<decimal?>("Total_Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("TransactionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("OrderId");
 
                     b.HasIndex("AddressId");
 
+                    b.HasIndex("TransactionId");
+
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("BusinessObjects.Models.Ecom.Payment.PaymentDetails", b =>
-                {
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Language")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("MerchantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("PaidDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentGate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("RequiredAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PaymentId");
-
-                    b.HasIndex("MerchantId");
-
-                    b.ToTable("PaymentDetails");
                 });
 
             modelBuilder.Entity("BusinessObjects.Models.Ecom.Payment.TransactionRecord", b =>
                 {
-                    b.Property<string>("PaymentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("Amount")
                         .HasColumnType("decimal(18,2)");
@@ -492,16 +455,13 @@ namespace BusinessObjects.Migrations
                     b.Property<string>("PaymentMessage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PaymentRefId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PaymentStatus")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Signature")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("PaymentId");
+                    b.HasKey("TransactionId");
 
                     b.ToTable("Transactions");
                 });
@@ -723,7 +683,7 @@ namespace BusinessObjects.Migrations
 
             modelBuilder.Entity("BusinessObjects.Models.Creative.SubRecord", b =>
                 {
-                    b.HasOne("BusinessObjects.Models.Ecom.Payment.PaymentDetails", "PaymentDetails")
+                    b.HasOne("BusinessObjects.Models.Ecom.Payment.TransactionRecord", "Transaction")
                         .WithMany()
                         .HasForeignKey("BillingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -735,9 +695,9 @@ namespace BusinessObjects.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("PaymentDetails");
-
                     b.Navigation("Subscription");
+
+                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("BusinessObjects.Models.Creative.Subscription", b =>
@@ -801,18 +761,13 @@ namespace BusinessObjects.Migrations
                         .WithMany()
                         .HasForeignKey("AddressId");
 
-                    b.Navigation("Address");
-                });
-
-            modelBuilder.Entity("BusinessObjects.Models.Ecom.Payment.PaymentDetails", b =>
-                {
-                    b.HasOne("BusinessObjects.Models.AppUser", "Merchant")
+                    b.HasOne("BusinessObjects.Models.Ecom.Payment.TransactionRecord", "Transaction")
                         .WithMany()
-                        .HasForeignKey("MerchantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TransactionId");
 
-                    b.Navigation("Merchant");
+                    b.Navigation("Address");
+
+                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("BusinessObjects.Models.Ecom.Rating.RatingRecord", b =>
