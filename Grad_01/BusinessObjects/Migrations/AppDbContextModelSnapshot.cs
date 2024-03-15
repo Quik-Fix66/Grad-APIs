@@ -42,7 +42,7 @@ namespace BusinessObjects.Migrations
                     b.Property<string>("SubDistrict")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("AddressId");
@@ -61,12 +61,21 @@ namespace BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("BusinessType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PostAddressId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("AgencyId");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("PostAddressId");
 
                     b.ToTable("Agencies");
                 });
@@ -79,6 +88,9 @@ namespace BusinessObjects.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsSeller")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsValidated")
                         .HasColumnType("bit");
@@ -610,13 +622,11 @@ namespace BusinessObjects.Migrations
 
             modelBuilder.Entity("BusinessObjects.Models.Address", b =>
                 {
-                    b.HasOne("BusinessObjects.Models.AppUser", "AppUser")
+                    b.HasOne("BusinessObjects.Models.AppUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("AppUser");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BusinessObjects.Models.Agency", b =>
@@ -627,7 +637,15 @@ namespace BusinessObjects.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BusinessObjects.Models.Address", "PostAddress")
+                        .WithMany()
+                        .HasForeignKey("PostAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Owner");
+
+                    b.Navigation("PostAddress");
                 });
 
             modelBuilder.Entity("BusinessObjects.Models.AppUser", b =>
