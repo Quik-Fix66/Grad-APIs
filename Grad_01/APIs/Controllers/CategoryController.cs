@@ -11,9 +11,12 @@ namespace APIs.Controllers
     public class CategoryController: ControllerBase
 	{
 		private readonly ICategoryService _cateServices;
-		public CategoryController(ICategoryService cateServices)
+		private readonly ICloudinaryService _clouinaryService;
+
+		public CategoryController(ICategoryService cateServices, ICloudinaryService cloudinaryService)
 		{
 			_cateServices = cateServices;
+			_clouinaryService = cloudinaryService;
 		}
 
 		[HttpPost("add-category")]
@@ -112,6 +115,7 @@ namespace APIs.Controllers
 				throw new Exception(e.Message);
 			}
 		}
-	}
+
+    }
 }
 

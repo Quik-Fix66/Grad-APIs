@@ -4,6 +4,7 @@ using APIs.Services.Interfaces;
 using BusinessObjects.DTO;
 using CloudinaryDotNet.Actions;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace APIs.Services
 {
@@ -24,11 +25,12 @@ namespace APIs.Services
                 );
         }
 
-        public CloudinaryResponseDTO UploadImage(IFormFile uFile)
+        public CloudinaryResponseDTO UploadImage(IFormFile uFile, string dir)
         {
             var client = new Cloudinary(account);
             var imageuploadParams = new ImageUploadParams()
             {
+                Folder = dir,
                 File = new FileDescription(uFile.FileName, uFile.OpenReadStream()),
                 DisplayName = uFile.FileName
             };
@@ -56,6 +58,38 @@ namespace APIs.Services
                 Data = uploadResult.SecureUrl.ToString()
             };
         }
+
+        public CloudinaryResponseDTO DeleteImage(string imgUrl, string dir)
+        {
+            var client = new Cloudinary(account);
+            string publicId = Regex.Match(imgUrl, $@"{account.Cloud}/image/upload/v\d+/(.*)\.\w+").Groups[1].Value;
+
+            DeletionParams deletionParams = new DeletionParams(publicId);
+
+            var result = client.Destroy(deletionParams);
+            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                return new CloudinaryResponseDTO()
+                {
+                    StatusCode = (int)result.StatusCode,
+                    Message = result.Error.Message
+                };
+            }
+            if (result == null)
+            {
+                return new CloudinaryResponseDTO()
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "Undefied error!"
+                };
+            }
+            return new CloudinaryResponseDTO()
+            {
+                StatusCode = (int)result.StatusCode,
+                Message = "Delete successful!",
+            };
+        }
+
     }
 }
 
