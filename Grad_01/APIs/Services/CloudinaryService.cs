@@ -10,7 +10,7 @@ namespace APIs.Services
 	public class CloudinaryService: ICloudinaryService
 	{
 
-        private readonly string _imagePath = @"Data\Images\Venues";
+        private readonly string _imagePath = @"Data\Images\";
         private readonly IConfiguration _config;
         private readonly Account account;
 
@@ -23,9 +23,6 @@ namespace APIs.Services
                  config.GetSection("Cloudinary")["ApiSerect"]
                 );
         }
-
-        public string GetImagePath(IFormFile uFile) => Path.Combine(_imagePath, uFile.FileName);
-
 
         public CloudinaryResponseDTO UploadImage(IFormFile uFile)
         {
