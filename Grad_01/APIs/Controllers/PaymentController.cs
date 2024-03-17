@@ -38,6 +38,7 @@ namespace APIs.Controllers
             return Ok(response);
         }
 
+
         [HttpGet]
         [Route("vnpay/VnPayIPN")]
         public IActionResult VnpayIpnReturnAsync([FromQuery] VnPayResponseDTO response)
@@ -50,27 +51,26 @@ namespace APIs.Controllers
 
             TransactionRecord transaction = new TransactionRecord()
             {
-                PaymentId = dto.PaymentId,
+                //PaymentId = dto.PaymentId,
                 PaymentDate = dto.PaymentDate,
                 PaymentMessage = dto.PaymentMessage,
-                PaymentRefId = dto.PaymentRefId,
+                TransactionId = Guid.Parse(dto.PaymentRefId),
                 PaymentStatus = dto.PaymentStatus,
                 Amount = dto.Amount,
                 Signature = dto.Signature
             };
 
             _transacService.AddTransactionRecord(transaction);
-
             if (processResult.Success)
             {
                 returnModel = processResult.Data.Item1;
                 //returnUrl = processResult.Data.Item2;
-                return Ok(returnModel);
+
+                string redirectUrl = "http://localhost:5000/checkout-result?refId=" + returnModel.PaymentRefId;  // Replace with your desired URL
+                return Redirect(redirectUrl);
+
             }
-            //    returnModel = processResult.Data.Item1;
-            //    returnUrl = processResult.Data.Item2;
-            //    if (returnUrl.EndsWith("/"))
-            //    returnUrl = returnUrl.Remove(returnUrl.Length - 1, 1);
+     
             return BadRequest(returnModel);
         }
 

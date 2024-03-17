@@ -28,6 +28,44 @@ namespace DataAccess.DAO.Ecom
 				return dto;
 			}
 		}
-    }
+
+		public int GetProductStock(Guid productId)
+		{
+			try
+			{
+				using(var context = new AppDbContext())
+				{
+					Inventory? record = context.Inventories.Where(i => i.BookId == productId).SingleOrDefault();
+
+					if (record == null) return 0;
+					else
+					{
+                    return record.Quantity;
+                    }
+                }
+
+			}
+			catch (Exception e)
+			{
+				throw new Exception(e.Message);
+			}
+		}
+
+		public int AddNewAgency(Agency agency)
+		{
+			try
+			{
+				using(var context = new AppDbContext())
+				{
+					context.Agencies.Add(agency);
+					return context.SaveChanges();
+				}
+			}
+			catch(Exception e)
+			{
+				throw new Exception(e.Message);
+			}
+		}
+	}
 }
 

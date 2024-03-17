@@ -172,21 +172,88 @@ namespace DataAccess.DAO
                 throw new Exception(e.Message);
             }
         }
-        //public UserProfile GetUserProfile(Guid userId)
-        //{
-        //    try
-        //    {
-        //        UserProfile profile = new UserProfile();
-        //        using (var context = new AppDbContext())
-        //        {
-                   
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
+
+        //Account validation
+        public int SetIsAccountValid(bool choice, Guid userId)
+        {
+            try
+            {
+                using (var context = new AppDbContext())
+                {
+                    AppUser? user = context.AppUsers.Where(u => u.UserId == userId).SingleOrDefault();
+                    if(user != null)
+                    {
+                        user.IsValidated = choice;
+                    }
+                    return context.SaveChanges();
+                }
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public bool IsUserValidated(Guid userId)
+        {
+            try
+            {
+                using(var context = new AppDbContext())
+                {
+                    AppUser? user = context.AppUsers.Where(u => u.UserId == userId).SingleOrDefault();
+                    if(user != null)
+                    {
+                        return user.IsValidated;
+                    }
+                    return false;
+                }
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        //Agency registration
+        public int SetIsAgency(bool choice, Guid userId)
+        {
+            try
+            {
+                using(var context = new AppDbContext())
+                {
+                    AppUser? user = context.AppUsers.Where(u => u.UserId == userId).SingleOrDefault();
+                    if(user != null)
+                    {
+                        user.IsSeller = choice;
+                    }
+                    return context.SaveChanges();
+                }
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public bool IsSeller(Guid userId)
+        {
+            try
+            {
+                using (var context = new AppDbContext())
+                {
+                    AppUser? user = context.AppUsers.Where(u => u.UserId == userId).SingleOrDefault();
+                    if (user != null)
+                    {
+                        return user.IsSeller;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }
 

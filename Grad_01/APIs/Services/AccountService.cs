@@ -6,6 +6,7 @@ using APIs.Services.Interfaces;
 using BusinessObjects.DTO;
 using BusinessObjects.Models;
 using DataAccess.DAO;
+using DataAccess.DAO.Ecom;
 using DataAccess.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -43,6 +44,7 @@ namespace APIs.Repositories.Interfaces
                 Email = model.Email,
                 Password = Convert.ToHexString(pwdHash),
                 Salt = Convert.ToHexString(salt),
+                IsValidated = false,
                 RoleId = GetRoleDetails("BaseUser").RoleId,
             };
             accountDAO.CreateAccount(user);
@@ -127,18 +129,51 @@ namespace APIs.Repositories.Interfaces
 
         public Address GetDefaultAddress(Guid userId) => new AddressDAO().GetUserDefaultAddress(userId);
 
-        //public UserProfile? GetUserProfile(string token)
-        //{
-        //    UserProfile? profile = new UserProfile();
-        //    try
-        //    {
-               
-        //    }
-        //    catch(Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
+        //Account validation
+        public int SetUserIsValidated(bool choice, Guid userId) => new AccountDAO().SetIsAccountValid(choice, userId);
+
+        public bool IsUserValidated(Guid userId) => new AccountDAO().IsUserValidated(userId);
+
+        //Agency Registration
+        public string RegisterAgency(AgencyRegistrationDTO dto)
+        {
+            //register post address
+            AddressDAO dao = new AddressDAO();
+            AccountDAO accDAO = new AccountDAO();
+            AgencyDAO agencyDAO = new AgencyDAO();
+
+            Guid addressId = Guid.NewGuid();
+            int newAddress = dao.AddNewAddress(new Address
+            {
+                AddressId = addressId,
+                Rendezvous = dto.Rendezvous,
+                Default = true
+            });
+            //add new agency
+            if (newAddress > 0)
+            {
+                int newAgency = agencyDAO.AddNewAgency(new Agency
+                {
+                    AgencyId = Guid.NewGuid(),
+                    AgencyName = dto.AgencyName,
+                    PostAddressId = addressId,
+                    BusinessType = dto.BusinessType,
+                    OwnerId = dto.OwnerId
+                });
+                if (newAgency > 0)
+                {
+                    int changes = accDAO.SetIsAgency(true, dto.OwnerId);
+                    if (changes > 0) return "Successful!";
+                    else return "Fail to set agency!";
+                }
+                else return "Fail to add new agency!";
+            }
+            else return "Fail to add address!";
+            //change IsSeller in AppUser
+        }
+
+        public bool IsSeller(Guid userId) => new AccountDAO().IsSeller(userId);
+      
     }
 }
 
