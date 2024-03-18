@@ -98,10 +98,10 @@ namespace APIs.Controllers
                     {
                         return BadRequest("Category id is cannot be null!");
                     }
-                    string imgUrl = string.Empty;
+                    string imgUrl = _cateServices.GetOldImgPath((Guid)dto.CateId);
                     if (dto.CateImg != null)
                     {
-						string oldImg = _cateServices.GetOldImgPath((Guid)dto.CateId);
+						string oldImg = imgUrl;
 
                         if (oldImg != "")
 						{
@@ -169,6 +169,22 @@ namespace APIs.Controllers
 			}
 		}
 
+        [HttpGet("search-category")]
+        public IActionResult SearchCategory(string? inputString, [FromQuery] PagingParams param)
+        {
+            try
+			{
+				if (inputString != null && inputString != "")
+				{
+                    return Ok(_cateServices.GetCategoryByName(inputString, param));
+				}
+                    return Ok(_cateServices.GetAllCategory(param));
+            }
+            catch (Exception e)
+			{
+				throw new Exception(e.Message);
+			}
+		}
     }
 }
 
