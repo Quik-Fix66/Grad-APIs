@@ -12,6 +12,7 @@ namespace BusinessObjects.Models.Trading
         public Guid PostInterestId { get; set; }
         public Guid InteresterId { get; set; }
         public Guid PostId { get; set; }
+        public bool IsChosen { get; set; }
         public DateTime CreateDate { get; set; }
 
         [ForeignKey("PostId"), JsonIgnore]

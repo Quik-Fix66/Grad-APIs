@@ -8,7 +8,7 @@ namespace APIs.Services.Interfaces
 		int AddNewAddress(Address address);
 		PagedList<Address> GetAllUserAddress(Guid userId, PagingParams @params);
 		int UpdateAddressDefault(Address address);
-
+		Task<int> DeleteAddressAsync(Guid addressId);
     }
 }
 

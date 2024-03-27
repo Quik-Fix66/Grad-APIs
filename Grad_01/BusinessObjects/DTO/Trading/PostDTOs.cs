@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Models.E_com.Trading;
+using BusinessObjects.Models.Trading;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace BusinessObjects.DTO.Trading
         public bool IsTradePost { get; set; }
         //public List<string> CateId { get; set; } = null!;
     }
+
 
     public class UpdatePostDTOs
     {
@@ -59,6 +61,13 @@ namespace BusinessObjects.DTO.Trading
         public string Content { get; set; } = null!;
     }
 
+    public class AddCommentReturnDTO
+    {
+        public Comment CmtData { get; set; } = null!;
+        public string Username { get; set; } = null!;
+        public string AvatarDir { get; set; } = null!;
+    }
+
     //public class UpdateCommentDTO
     //{
     //    public Guid CommentId { get; set; }
@@ -74,6 +83,12 @@ namespace BusinessObjects.DTO.Trading
         public string Username { get; set; } = null!;
         public string? AvatarDir { get; set; }
         public DateTime CreateDate { get; set; }
+    }
+
+    public class AcceptTradeDTO
+    {
+        public Guid PostId { get; set; }
+        public Guid InteresterId { get; set; }
     }
 
     public class AddPostInterestDTO

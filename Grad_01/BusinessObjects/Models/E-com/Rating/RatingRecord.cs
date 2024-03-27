@@ -9,15 +9,20 @@ namespace BusinessObjects.Models.Ecom.Rating
 	{
 		[Key]
 		public Guid RatingRecordId { get; set; }
-		public Guid RatingId { get; set; }
-		public Guid UserId { get; set; }
+		public Guid ReviewerId { get; set; }
+		public Guid? RatingId { get; set; }
+		public Guid RevieweeId { get; set; }
 		public int RatingPoint { get; set; }
 		public string? Comment { get; set; }
 
 		[ForeignKey("RatingId"), JsonIgnore]
-		public virtual Rating? Rating { get; set; }
-        [ForeignKey("UserId"), JsonIgnore]
-        public virtual AppUser? AppUser { get; set; }
+		public Rating? Rating { get; set; } 
+
+		[ForeignKey("ReviewerId"), JsonIgnore]
+		public AppUser? Reviewer { get; set; } = null!;
+
+        [ForeignKey("RevieweeId"), JsonIgnore]
+        public AppUser? Reviewee { get; set; } = null!;
     }
 }
 

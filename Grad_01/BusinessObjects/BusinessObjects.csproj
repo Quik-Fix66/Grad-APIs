@@ -33,6 +33,7 @@
     <None Remove="Models\Trading\" />
     <None Remove="DTO\Subscription\" />
     <None Remove="Models\Authorization\" />
+    <None Remove="Enums\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\E-com\" />
@@ -42,5 +43,6 @@
     <Folder Include="Models\Trading\" />
     <Folder Include="DTO\Subscription\" />
     <Folder Include="Models\Authorization\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
 </Project>

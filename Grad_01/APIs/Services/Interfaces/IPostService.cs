@@ -29,6 +29,12 @@ namespace APIs.Services.Interfaces
 
         Task<bool> IsTradePostAsync(Guid postId);
 
+        Task<bool> IsLockedPostAsync(Guid postId);
+
+        Task<int> SetLockPostAsync(bool choice, Guid postId);
+
+        Task<bool> IsPostOwnerAsync(Guid postId, Guid userId);
+
         ////---------------------------------------------COMMENT-------------------------------------------------------//
 
         Task<PagedList<CommentDetailsDTO>> GetCommentByPostIdAsync(Guid postId, PagingParams @params);
@@ -52,5 +58,9 @@ namespace APIs.Services.Interfaces
         Task<int> DeleteInteresterByIdAsync(Guid postInterestId);
 
         Task<PagedList<PostInterester>> GetInteresterByPostIdAsync(Guid postId, PagingParams @params);
+
+        Task<int> SetIsChosen(bool choice, Guid postInterestId);
+
+        Task<Guid?> GetLockedRecordIdAsync(Guid traderId, Guid postId);
     }
 }

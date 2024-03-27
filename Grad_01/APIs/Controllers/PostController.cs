@@ -8,7 +8,9 @@ using BusinessObjects.Models;
 using BusinessObjects.Models.E_com.Trading;
 using BusinessObjects.Models.Trading;
 using Microsoft.AspNetCore.Mvc;
+using BusinessObjects.Enums;
 using Newtonsoft.Json;
+using static BusinessObjects.DTO.Trading.TradeDTOs;
 
 namespace APIs.Controllers
 {
@@ -19,11 +21,16 @@ namespace APIs.Controllers
         private readonly IPostService _postService;
         private readonly IAccountService _accountService;
         private readonly ICloudinaryService _cloudinaryService;
-        public PostController(IPostService postService, ICloudinaryService cloudinaryService, IAccountService accountService)
+        private readonly IAddressService _addressService;
+        private readonly ITradeService _tradeService;
+
+        public PostController(IPostService postService, ICloudinaryService cloudinaryService, IAccountService accountService, IAddressService addressService, ITradeService tradeService)
         {
             _cloudinaryService = cloudinaryService;
+            _addressService = addressService;
             _postService = postService;
             _accountService = accountService;
+            _tradeService = tradeService;
         }
         //---------------------------------------------POST-------------------------------------------------------//
 
@@ -256,21 +263,37 @@ namespace APIs.Controllers
         [HttpPost("add-comment")]
         public async Task<IActionResult> AddCommenAsync([FromBody] AddCommentDTO comment)
         {
-           
                 if (ModelState.IsValid)
                 {
+                    CommentDetailsDTO apiRespone = new CommentDetailsDTO();
                     Guid cmtId = Guid.NewGuid();
+                    DateTime createDate = DateTime.Now;
+                    var commenter = await _accountService.FindUserByIdAsync(comment.CommenterId);
                     int cmtChanges = await _postService.AddCommentAsync(new Comment()
                     {
                         CommentId = cmtId,
                         CommenterId = comment.CommenterId,
                         Content = comment.Content,
-                        CreateDate = DateTime.Now,
+                        CreateDate = createDate,
                     });
                     if (cmtChanges > 0)
                     {
                     int recordChanges = await _postService.AddNewCommentRecord(cmtId, comment.PostId);
-                    if (recordChanges > 0) return Ok("Successful!");
+                    if (recordChanges > 0)
+                    {
+                        apiRespone.CommentId = cmtId;
+                        apiRespone.CommenterId = comment.CommenterId;
+                        apiRespone.Content = comment.Content;
+                        apiRespone.CreateDate = createDate;
+                        apiRespone.PostId = comment.PostId;
+
+                        if(commenter != null)
+                        {
+                            apiRespone.Username = commenter.Username;
+                            apiRespone.AvatarDir = commenter.AvatarDir;
+                        }
+                        return Ok(apiRespone);
+                    }
                     else return Ok("Fail to add comment record, Deleted comments: " + await _postService.DeleteCommentByIdAsync(cmtId));
                     }
                     return BadRequest("Add fail!");
@@ -389,24 +412,114 @@ namespace APIs.Controllers
                 {
                     if(await _postService.IsTradePostAsync(postInterest.PostId))
                     {
-                        int result = await _postService.AddNewInteresterAsync(new PostInterester()
+                        if(!await _postService.IsLockedPostAsync(postInterest.PostId))
                         {
-                            PostInterestId = Guid.NewGuid(),
-                            PostId = postInterest.PostId,
-                            InteresterId = postInterest.InteresterId,
-                            CreateDate = DateTime.Now
-                        });
-                        if (result > 0)
-                        {
-                            return Ok("Successful!");
+                            int result = await _postService.AddNewInteresterAsync(new PostInterester()
+                            {
+                                PostInterestId = Guid.NewGuid(),
+                                PostId = postInterest.PostId,
+                                InteresterId = postInterest.InteresterId,
+                                CreateDate = DateTime.Now
+                            });
+                            if (result > 0)
+                            {
+                                return Ok("Successful!");
+                            }
+                            return BadRequest("Add false");
                         }
-                        return BadRequest("Add false");
+                        return BadRequest("Post is locked!");
                     }
                     return BadRequest("Not a trade post!");
                 }
                 return BadRequest("Comment Invalid");
             }
             catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        [HttpPost("accept-trade")]
+        public async Task<IActionResult> AccepTradeAsync([FromBody] AcceptTradeDTO dto)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    int lockResult = await _postService.SetLockPostAsync(true, dto.PostId);
+                    if(lockResult > 0)
+                    {
+                        Guid? recordId = await _postService.GetLockedRecordIdAsync(dto.InteresterId, dto.PostId);
+                        if(recordId != null)
+                        {
+                            int isChosenChanges = await _postService.SetIsChosen(true, (Guid)recordId);
+                            if (isChosenChanges > 0)
+                            {
+                                return Ok(dto.PostId);
+                            }
+                            else {
+
+                                return BadRequest("Fail to set chosen trader! revert lock post: " + await _postService.SetLockPostAsync(false, dto.PostId));
+                            }
+                        } return BadRequest("Lock record not found! revert lock post: " + await _postService.SetLockPostAsync(false, dto.PostId));
+                        
+                    } return BadRequest("Fail to lock post!");
+                } return BadRequest("Model invalid!");
+            }
+            catch(Exception e){
+                throw new Exception(e.Message);
+            }
+        }
+
+        [HttpPost("submit-trade-details")]
+        public async Task<IActionResult> SubmitTradeDetails([FromBody] SubmitTradeDetailDTO dto)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    Guid recordId = Guid.NewGuid();
+                    Guid addressId = Guid.NewGuid();
+                    bool isPostOwner = await _postService.IsPostOwnerAsync(dto.PostId, dto.TraderId);
+
+                    int addressChanges = _addressService.AddNewAddress(new Address
+                    {
+                        AddressId = addressId,
+                        City_Province = dto.City_Province,
+                        District = dto.District,
+                        SubDistrict = dto.SubDistrict,
+                        Rendezvous = dto.Rendezvous,
+                        UserId = dto.TraderId
+                    });
+                    if(addressChanges > 0)
+                    {
+                        Guid? lockedRecordId = await _postService.GetLockedRecordIdAsync(dto.TraderId, dto.PostId);
+                        if(lockedRecordId != null)
+                        {
+                            TradeDetails details = new TradeDetails
+                            {
+                                TradeDetailId = recordId,
+                                AddressId = addressId,
+                                IsPostOwner = isPostOwner,
+                                Status = TradeStatus.Submited,
+                                LockedRecordId = (Guid)lockedRecordId,
+                                Note = dto.Note,
+                                Phone = dto.Phone
+                            };
+                            int tradeDetailsChanges = await _tradeService.AddNewTradeDetailsAsync(details);
+                            if (tradeDetailsChanges > 0) return Ok(details);
+                            else
+                            {
+                                
+                                return BadRequest("Fail to add trade details! Address deleted: " + await _addressService.DeleteAddressAsync(addressId));
+                            }
+                            
+                        }return BadRequest("Locked record not found! Address deleted:" + await _addressService.DeleteAddressAsync(addressId));
+                    } return BadRequest("Fail to add address!");
+
+                } return BadRequest("Model state invalid!");
+            }
+            catch(Exception e)
             {
                 throw new Exception(e.Message);
             }

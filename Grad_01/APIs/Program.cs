@@ -47,7 +47,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
-//builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddScoped<ITradeService, TradeService>();
 
 //Repositories
 builder.Services.AddScoped<ICartRepository, CartRepository>();

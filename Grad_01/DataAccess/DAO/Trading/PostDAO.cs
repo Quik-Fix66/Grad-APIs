@@ -11,20 +11,17 @@ namespace DataAccess.DAO.E_com
         {
             _context = new AppDbContext();
         }
-        //Get all post
         public async Task<List<Post>> GetAllPostAsync() => await _context.Posts.ToListAsync();
 
 
-        //Get post by id
         public async Task<Post?> GetPostByIdAsync(Guid postId) => await _context.Posts.SingleOrDefaultAsync(p => p.PostId == postId);
 
-        //Add new post
         public async Task<int> AddNewPostAsync(Post post)
         {
             await _context.Posts.AddAsync(post);
             return await _context.SaveChangesAsync();
         }
-        //Modify post
+
         public async Task<int> UpdatePostAsync(Post post)
         {
            
@@ -36,7 +33,6 @@ namespace DataAccess.DAO.E_com
                 } return 0;
         }
 
-        //Delete post by id
         public async Task<int> DeletePostByIdAsync(Guid postId)
         {
             Post? post = await GetPostByIdAsync(postId);
@@ -69,5 +65,27 @@ namespace DataAccess.DAO.E_com
             bool result = (record != null) ? record.IsTradePost : false;
             return result;
         }
+
+        public async Task<bool> IsLockedPostAsync(Guid postId)
+        {
+            Post? record = await _context.Posts.SingleOrDefaultAsync(p => p.PostId == postId);
+            bool result = (record != null) ? record.IsLock : false;
+            return result;
+        }
+
+        //For trade
+        public async Task<int> SetLockPostAsync(bool choice, Guid postId)
+        {
+            Post? post = await _context.Posts.SingleOrDefaultAsync(p => p.PostId == postId);
+            if(post != null)
+            {
+                post.IsLock = choice;
+            }
+            return await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsPostOwnerAsync(Guid postId, Guid userId)
+        => await _context.Posts.AnyAsync(p => p.PostId == postId && p.UserId == userId);
+     
     }
 }

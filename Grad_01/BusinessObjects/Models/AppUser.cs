@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BusinessObjects.Models.Ecom.Rating;
 using Newtonsoft.Json;
 
 namespace BusinessObjects.Models
@@ -16,6 +17,7 @@ namespace BusinessObjects.Models
 		public string? AvatarDir { get; set; }
 		public bool IsValidated { get; set; } = false;
 		public bool IsBanned { get; set; } = false;
+		public double OverallRating { get; set; }
 	}
 }
 

@@ -10,6 +10,8 @@ namespace APIs.Services
     {
         public int AddNewAddress(Address address) => new AddressDAO().AddNewAddress(address);
 
+        public async Task<int> DeleteAddressAsync(Guid addressId) => (await new AddressDAO().DeleteAddressAsync(addressId));
+
         public PagedList<Address> GetAllUserAddress(Guid userId, PagingParams @params)
         {
             return PagedList<Address>.ToPagedList(new AddressDAO().GetAllUserAddress(userId).AsQueryable(), @params.PageNumber, @params.PageSize);

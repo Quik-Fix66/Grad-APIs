@@ -1,4 +1,4 @@
-﻿/*using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +8,16 @@ namespace BusinessObjects.DTO.Trading
 {
     public class TradeDTOs
     {
-    *//*    public class TradeDetailDTOs
+       public class SubmitTradeDetailDTO
         {
-            public Guid TradeDetailId { get; set; }
             public Guid PostId { get; set; }
             public Guid TraderId { get; set; }
-            public string Address { get; set; }
-            public string Phone { get; set; }
-            public string Note { get; set; }
-        } *//*
+            public string? City_Province { get; set; }
+            public string? District { get; set; }
+            public string? SubDistrict { get; set; }
+            public string Rendezvous { get; set; } = null!;
+            public string? Phone { get; set; }
+            public string? Note { get; set; }
+        } 
     }
-}*/
+}

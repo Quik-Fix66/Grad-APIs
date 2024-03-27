@@ -42,7 +42,11 @@ namespace APIs.Services
 
         public async Task<string> GetOldVideoPathAsync(Guid postId) => await _postDAO.GetOldVideoPathAsync(postId);
 
-        public async Task<bool> IsTradePostAsync(Guid userId) => await _postDAO.IsTradePostAsync(userId);
+        public async Task<bool> IsTradePostAsync(Guid postId) => await _postDAO.IsTradePostAsync(postId);
+
+        public async Task<bool> IsLockedPostAsync(Guid postId) => await _postDAO.IsLockedPostAsync(postId);
+
+        public async Task<int> SetLockPostAsync(bool choice, Guid postId) => await _postDAO.SetLockPostAsync(choice, postId);
 
         //---------------------------------------------COMMENT-------------------------------------------------------//
 
@@ -75,5 +79,13 @@ namespace APIs.Services
             return PagedList<PostInterester>.ToPagedList((await _postInterestDAO.GetPostInterestByPostIdAsync(postId))?.OrderBy(ch => ch.PostInterestId).AsQueryable(), @params.PageNumber, @params.PageSize);
         }
 
+        public Task<int> SetIsChosenAsync(bool choice, Guid postInterestId) => _postInterestDAO.SetIsChosenAsync(choice, postInterestId);
+
+        public Task<int> SetIsChosen(bool choice, Guid postInterestId) => _postInterestDAO.SetIsChosenAsync(choice, postInterestId);
+
+        public async Task<bool> IsPostOwnerAsync(Guid postId, Guid userId) => await _postDAO.IsPostOwnerAsync(postId, userId);
+
+        public async Task<Guid?> GetLockedRecordIdAsync(Guid traderId, Guid postId) => await _postInterestDAO.GetLockedRecordIdAsync(traderId, postId);
+       
     }
 }

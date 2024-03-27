@@ -49,7 +49,7 @@ namespace BusinessObjects
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<PostInterester> PostInteresters { get; set; }
         public virtual DbSet<PostComment> PostComments { get; set; }
-        //public virtual DbSet<TradeDetail> TradeDetails { get; set; }
+        public virtual DbSet<TradeDetails> TradeDetails { get; set; }
 
         //Utility DbSets
         public virtual DbSet<Role> Roles { get; set; }
@@ -144,6 +144,12 @@ namespace BusinessObjects
             .WithMany()
             .HasForeignKey(a => a.PostId)
             .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RatingRecord>()
+              .HasOne(r => r.Reviewer)
+              .WithMany()
+              .HasForeignKey(r => r.ReviewerId)
+              .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

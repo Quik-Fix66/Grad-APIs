@@ -1,11 +1,17 @@
 ﻿using System;
 using BusinessObjects;
 using BusinessObjects.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.DAO
 {
 	public class AddressDAO
 	{
+		private readonly AppDbContext _context;
+		public AddressDAO()
+		{
+			_context = new AppDbContext();
+		}
 		//Get all address of a user
 		public List<Address> GetAllUserAddress(Guid userId)
 		{
@@ -151,6 +157,16 @@ namespace DataAccess.DAO
 			{
 				throw new Exception(e.Message);
 			}
+		}
+
+		public async Task<int> DeleteAddressAsync(Guid addressId)
+		{
+			Address? address = await _context.Addresses.SingleOrDefaultAsync(a => a.AddressId == addressId);
+			if(address != null)
+			{
+				_context.Addresses.Remove(address);
+			}
+			return await _context.SaveChangesAsync();
 		}
 	}
 }

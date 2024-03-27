@@ -14,32 +14,62 @@ namespace DataAccess.DAO.Trading
 
         //Get postInterest by post id
         public async Task<List<PostInterester>> GetPostInterestByPostIdAsync(Guid postId)
-        =>  await _context.PostInteresters.Where(p => p.PostId == postId).ToListAsync();
+        => await _context.PostInteresters.Where(p => p.PostId == postId).ToListAsync();
 
         //Add Interest
         public async Task<int> AddNewPostInterestAsync(PostInterester postInterest)
-        { 
-               await _context.PostInteresters.AddAsync(postInterest);
-                    return await _context.SaveChangesAsync();
+        {
+            await _context.PostInteresters.AddAsync(postInterest);
+            return await _context.SaveChangesAsync();
         }
 
         //Update PostInterest
         public int UpdatePostInterest(PostInterester postInterest)
         {
-           _context.Update(postInterest);
+            _context.Update(postInterest);
             return _context.SaveChanges();
         }
 
         //Delete PostInterest by id
         public async Task<int> DeletePostInterestByIdAsync(Guid postInterestId)
         {
-                    PostInterester? postInterest = await _context.PostInteresters.SingleOrDefaultAsync(c => c.PostInterestId == postInterestId);
-                    if (postInterest != null)
-                    {
-                        _context.PostInteresters.Remove(postInterest);
-                    }
-                    return await _context.SaveChangesAsync();
-            
+            PostInterester? postInterest = await _context.PostInteresters.SingleOrDefaultAsync(c => c.PostInterestId == postInterestId);
+            if (postInterest != null)
+            {
+                _context.PostInteresters.Remove(postInterest);
+            }
+            return await _context.SaveChangesAsync();
+
         }
+
+        public async Task<int> SetIsChosenAsync(bool choice, Guid postInterestId)
+        {
+            PostInterester? record = await _context.PostInteresters.SingleOrDefaultAsync(c => c.PostInterestId == postInterestId);
+            if(record != null)
+            {
+                record.IsChosen = choice;
+            }
+            return await _context.SaveChangesAsync();
+        }
+
+        public async Task<Guid?> GetLockedRecordIdAsync(Guid traderId, Guid postId)
+        {
+            PostInterester? record = await _context.PostInteresters.SingleOrDefaultAsync(p => p.PostId == postId && p.InteresterId == traderId);
+
+            if (record != null)
+            {
+                return record.PostInterestId;
+            }
+
+            var query = from r in _context.PostInteresters
+                        join p in _context.Posts on r.PostId equals p.PostId
+                        where r.PostId.Equals(postId)
+                        select new { r.PostInterestId };
+
+            var result = await query.SingleOrDefaultAsync();
+
+            return result?.PostInterestId;
+        }
+
     }
 }
