@@ -1,6 +1,4 @@
-﻿using System;
-using APIs.Services;
-using APIs.Services.Interfaces;
+﻿using APIs.Services.Interfaces;
 using APIs.Utils.Paging;
 using BusinessObjects.DTO;
 using BusinessObjects.Models;
@@ -15,12 +13,12 @@ namespace APIs.Controllers
     public class CategoryController: ControllerBase
 	{
 		private readonly ICategoryService _cateServices;
-		private readonly ICloudinaryService _clouinaryService;
+		private readonly ICloudinaryService _cloudinaryService;
 
 		public CategoryController(ICategoryService cateServices, ICloudinaryService cloudinaryService)
 		{
 			_cateServices = cateServices;
-			_clouinaryService = cloudinaryService;
+			_cloudinaryService = cloudinaryService;
 		}
 
 		[HttpPost("add-category")]
@@ -34,7 +32,7 @@ namespace APIs.Controllers
                     if (dto.CateImg != null)
 					{
 						CloudinaryResponseDTO cloudRsp
-						= _clouinaryService.UploadImage(dto.CateImg, "Categories/Book");
+						= _cloudinaryService.UploadImage(dto.CateImg, "Categories/Book");
 						if (cloudRsp.StatusCode == 200 && cloudRsp.Data != null)
 						{
 							imgUrl = cloudRsp.Data;
@@ -107,10 +105,10 @@ namespace APIs.Controllers
 
                         if (oldImg != "")
 						{
-							_clouinaryService.DeleteImage(oldImg, "Category");
+							_cloudinaryService.DeleteImage(oldImg, "Category");
 						}
                         CloudinaryResponseDTO cloudRsp
-                        = _clouinaryService.UploadImage(dto.CateImg, "Categories/Book");
+                        = _cloudinaryService.UploadImage(dto.CateImg, "Categories/Book");
                         if (cloudRsp.StatusCode == 200 && cloudRsp.Data != null)
                         {
                             imgUrl = cloudRsp.Data;
@@ -159,7 +157,7 @@ namespace APIs.Controllers
 
                     if (oldImg != "")
                     {
-                        _clouinaryService.DeleteImage(oldImg, "Category");
+                        _cloudinaryService.DeleteImage(oldImg, "Category");
                     }
                     int changes = _cateServices.DeleteCategory(cateId);
                 IActionResult result = (changes > 0) ? Ok("Successful!") : BadRequest("Delete fail!");
@@ -202,6 +200,7 @@ namespace APIs.Controllers
 				throw new Exception(e.Message);
 			}
 		}
-    }
+
+	}
 }
 

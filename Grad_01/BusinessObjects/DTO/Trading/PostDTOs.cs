@@ -67,6 +67,15 @@ namespace BusinessObjects.DTO.Trading
     //    public string Content { get; set; }
     //}
     //-------------------------------------------------POSTINTEREST-----------------------------------------------------//
+    public class InteresterDetailsDTO
+    {
+        public Guid RecordId { get; set; }
+        public Guid UserId { get; set; }
+        public string Username { get; set; } = null!;
+        public string? AvatarDir { get; set; }
+        public DateTime CreateDate { get; set; }
+    }
+
     public class AddPostInterestDTO
     {
         public Guid PostId { get; set; }

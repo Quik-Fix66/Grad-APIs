@@ -62,5 +62,12 @@ namespace DataAccess.DAO.E_com
             post.VideoDir : "";
             return result;
         }
+
+        public async Task<bool> IsTradePostAsync(Guid postId)
+        {
+            Post? record = await _context.Posts.SingleOrDefaultAsync(p => p.PostId == postId);
+            bool result = (record != null) ? record.IsTradePost : false;
+            return result;
+        }
     }
 }

@@ -1,84 +1,45 @@
 ﻿using BusinessObjects.Models.Trading;
 using BusinessObjects;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.DAO.Trading
 {
     public class PostInterestDAO
     {
-
-        //Get postInterest by post id
-        public IEnumerable<PostInterest>? GetPostInterestByPostId(Guid postId)
+        private readonly AppDbContext _context;
+        public PostInterestDAO()
         {
-            List<PostInterest>? postInterests = new List<PostInterest>();
-            try
-            {
-                using (var context = new AppDbContext())
-                {
-                    postInterests = context.PostInterests.Where(c => c.PostId == postId).ToList();
-                }
-                return postInterests;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+            _context = new AppDbContext();
         }
 
+        //Get postInterest by post id
+        public async Task<List<PostInterester>> GetPostInterestByPostIdAsync(Guid postId)
+        =>  await _context.PostInteresters.Where(p => p.PostId == postId).ToListAsync();
+
         //Add Interest
-        public int AddNewPostInterest(PostInterest postInterest)
-        {
-            try
-            {
-                using (var context = new AppDbContext())
-                {
-                    context.PostInterests.Add(postInterest);
-                    return context.SaveChanges();
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+        public async Task<int> AddNewPostInterestAsync(PostInterester postInterest)
+        { 
+               await _context.PostInteresters.AddAsync(postInterest);
+                    return await _context.SaveChangesAsync();
         }
 
         //Update PostInterest
-        public int UpdatePostInterest(PostInterest postInterest)
+        public int UpdatePostInterest(PostInterester postInterest)
         {
-            int result = 0;
-            try
-            {
-                using (var context = new AppDbContext())
-                {
-                    context.Update(postInterest);
-                    result = context.SaveChanges();
-                }
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+           _context.Update(postInterest);
+            return _context.SaveChanges();
         }
 
         //Delete PostInterest by id
-        public int DeletePostInterestById(Guid postInterestId)
+        public async Task<int> DeletePostInterestByIdAsync(Guid postInterestId)
         {
-            try
-            {
-                using (var context = new AppDbContext())
-                {
-                    PostInterest? postInterest = context.PostInterests.FirstOrDefault(c => c.PostInterestId == postInterestId);
+                    PostInterester? postInterest = await _context.PostInteresters.SingleOrDefaultAsync(c => c.PostInterestId == postInterestId);
                     if (postInterest != null)
                     {
-                        context.PostInterests.Remove(postInterest);
+                        _context.PostInteresters.Remove(postInterest);
                     }
-                    return context.SaveChanges();
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+                    return await _context.SaveChangesAsync();
+            
         }
     }
 }

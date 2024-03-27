@@ -12,12 +12,15 @@ namespace APIs.Services
     {
         private readonly PostDAO _postDAO;
         private readonly PostCommentDAO _postCommentDAO;
+        private readonly PostInterestDAO _postInterestDAO;
         private readonly CommentDAO _commentDAO;
         public PostService()
         {
+            _postInterestDAO = new PostInterestDAO();
             _postCommentDAO = new PostCommentDAO();
             _commentDAO = new CommentDAO();
             _postDAO = new PostDAO();
+
         }
 
         //---------------------------------------------POST-------------------------------------------------------//
@@ -39,6 +42,8 @@ namespace APIs.Services
 
         public async Task<string> GetOldVideoPathAsync(Guid postId) => await _postDAO.GetOldVideoPathAsync(postId);
 
+        public async Task<bool> IsTradePostAsync(Guid userId) => await _postDAO.IsTradePostAsync(userId);
+
         //---------------------------------------------COMMENT-------------------------------------------------------//
 
         public async Task<PagedList<CommentDetailsDTO>> GetCommentByPostIdAsync(Guid postId, PagingParams @params)
@@ -59,16 +64,16 @@ namespace APIs.Services
 
         ////---------------------------------------------POSTINTEREST-------------------------------------------------------//
 
-        //public int AddNewPostInterest(PostInterest postInterest) => new PostInterestDAO().AddNewPostInterest(postInterest);
+        public async Task<int> AddNewInteresterAsync(PostInterester postInterest) => await _postInterestDAO.AddNewPostInterestAsync(postInterest);
 
-        //public int UpdatePostInterest(PostInterest postInterest) => new PostInterestDAO().UpdatePostInterest(postInterest);
+        public int UpdateInterester(PostInterester postInterest) => _postInterestDAO.UpdatePostInterest(postInterest);
 
-        //public int DeletePostInterestById(Guid postInterestId) => new PostInterestDAO().DeletePostInterestById(postInterestId);
+        public async Task<int> DeleteInteresterByIdAsync(Guid postInterestId) => await _postInterestDAO.DeletePostInterestByIdAsync(postInterestId);
 
-        //public PagedList<PostInterest> GetPostInterestByPostId(Guid postId, PagingParams @params)
-        //{
-        //    return PagedList<PostInterest>.ToPagedList(new PostInterestDAO().GetPostInterestByPostId(postId)?.OrderBy(ch => ch.PostInterestId).AsQueryable(), @params.PageNumber, @params.PageSize);
-        //}
+        public async Task<PagedList<PostInterester>> GetInteresterByPostIdAsync(Guid postId, PagingParams @params)
+        {
+            return PagedList<PostInterester>.ToPagedList((await _postInterestDAO.GetPostInterestByPostIdAsync(postId))?.OrderBy(ch => ch.PostInterestId).AsQueryable(), @params.PageNumber, @params.PageSize);
+        }
 
     }
 }

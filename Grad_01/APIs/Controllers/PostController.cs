@@ -4,6 +4,7 @@ using APIs.Services.Interfaces;
 using APIs.Utils.Paging;
 using BusinessObjects.DTO;
 using BusinessObjects.DTO.Trading;
+using BusinessObjects.Models;
 using BusinessObjects.Models.E_com.Trading;
 using BusinessObjects.Models.Trading;
 using Microsoft.AspNetCore.Mvc;
@@ -67,7 +68,19 @@ namespace APIs.Controllers
         [HttpGet("get-post-by-id")]
         public async Task<IActionResult> GetPostByIdAsync(Guid postId)
         {
-          return Ok( await _postService.GetPostByIdAsync(postId));
+            var post = await _postService.GetPostByIdAsync(postId);
+
+            PostDetailsDTO result = new PostDetailsDTO();
+            if (post != null) { 
+                var user = await _accountService.FindUserByIdAsync(post.UserId);
+                if (user != null)
+                {
+                    result.PostData = post;
+                    result.Username = user.Username;
+                    result.AvatarDir = user.AvatarDir;
+                }
+             }
+            return Ok(result);
         }
 
         [HttpPost("add-new-post")]
@@ -321,112 +334,108 @@ namespace APIs.Controllers
 
         //    //---------------------------------------------POSTINTEREST-------------------------------------------------------//
 
-        //    [HttpGet("get-post-interest-by-post-id")]
-        //    public IActionResult GetPostInterestByPostId(Guid postId, [FromQuery] PagingParams @params)
-        //    {
-        //        try
-        //        {
-        //            var postInterest = _postService.GetPostInterestByPostId(postId, @params);
+        [HttpGet("get-post-interest-by-post-id")]
+        public async Task<IActionResult> GetPostInterestByPostIdAsync(Guid postId, [FromQuery] PagingParams @params)
+        {
+            try
+            {
+                var postInteresters = await _postService.GetInteresterByPostIdAsync(postId, @params);
+                List<InteresterDetailsDTO> result = new List<InteresterDetailsDTO>();
+
+                foreach (var p in postInteresters)
+                {
+                    var user = await _accountService.FindUserByIdAsync(p.InteresterId);
+                    if(user != null)
+                    {
+                        result.Add(new InteresterDetailsDTO
+                        {
+                            RecordId = p.PostInterestId,
+                            UserId = p.InteresterId,
+                            AvatarDir = user.AvatarDir,
+                            Username = user.Username,
+                            CreateDate = p.CreateDate
+                        });
+                    }
+                }
+
+                if (postInteresters != null)
+                {
+                    var metadata = new
+                    {
+                        postInteresters.TotalCount,
+                        postInteresters.PageSize,
+                        postInteresters.CurrentPage,
+                        postInteresters.TotalPages,
+                        postInteresters.HasNext,
+                        postInteresters.HasPrevious
+                    };
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                    return Ok(result);
+                }
+                else return BadRequest("No Interester!!!");
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        [HttpPost("add-post-interester")]
+        public async Task<IActionResult> AddNewPostInterestAsync([FromForm] AddPostInterestDTO postInterest)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if(await _postService.IsTradePostAsync(postInterest.PostId))
+                    {
+                        int result = await _postService.AddNewInteresterAsync(new PostInterester()
+                        {
+                            PostInterestId = Guid.NewGuid(),
+                            PostId = postInterest.PostId,
+                            InteresterId = postInterest.InteresterId,
+                            CreateDate = DateTime.Now
+                        });
+                        if (result > 0)
+                        {
+                            return Ok("Successful!");
+                        }
+                        return BadRequest("Add false");
+                    }
+                    return BadRequest("Not a trade post!");
+                }
+                return BadRequest("Comment Invalid");
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
 
-        //            if (postInterest != null)
-        //            {
-        //                var metadata = new
-        //                {
-        //                    postInterest.TotalCount,
-        //                    postInterest.PageSize,
-        //                    postInterest.CurrentPage,
-        //                    postInterest.TotalPages,
-        //                    postInterest.HasNext,
-        //                    postInterest.HasPrevious
-        //                };
-        //                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-        //                return Ok(postInterest);
-        //            }
-        //            else return BadRequest("No chapter!!!");
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            throw new Exception(e.Message);
-        //        }
-        //    }
-
-        //    [HttpPost("add-post-interest")]
-        //    public IActionResult AddNewPostInterest([FromForm] AddPostInterestDTO postInterest)
-        //    {
-        //        try
-        //        {
-        //            if (ModelState.IsValid)
-        //            {
-        //                int result = _postService.AddNewPostInterest(new PostInterest()
-        //                {
-        //                    PostInterestId = Guid.NewGuid(),
-        //                    PostId = postInterest.PostId,
-        //                    InteresterId = postInterest.InteresterId,
-        //                });
-        //                if (result > 0)
-        //                {
-        //                    return Ok();
-        //                }
-        //                return BadRequest("Add false");
-        //            }
-        //            return BadRequest("Comment Invalid");
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            throw new Exception(e.Message);
-        //        }
-        //    }
-
-        //    [HttpPut("update-post-interest")]
-        //    public IActionResult UpdatePostInterest([FromForm] UpdatePostInterestDTO postInterest)
-        //    {
-        //        try
-        //        {
-        //            if (ModelState.IsValid)
-        //            {
-        //                PostInterest updateData = new PostInterest
-        //                {
-        //                    PostInterestId = postInterest.PostInterestId,
-        //                    PostId = postInterest.PostId,
-        //                };
-        //                if (_postService.UpdatePostInterest(updateData) > 0)
-        //                {
-        //                    return Ok("Successful");
-        //                }
-        //                return BadRequest("Update fail");
-        //            }
-        //            return BadRequest("Model state invalid");
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            throw new Exception(e.Message);
-        //        }
-        //    }
-
-        //    [HttpDelete("delete-post-interest")]
-        //    public IActionResult DeletePostInterestById(Guid postInterestId)
-        //    {
-        //        try
-        //        {
-        //            _postService.DeletePostInterestById(postInterestId);
-        //            var response = new
-        //            {
-        //                StatusCode = 204,
-        //                Message = "Delete postInterest query was successful",
-        //            };
-        //            return Ok(response);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            var response = new
-        //            {
-        //                StatusCode = 500,
-        //                Message = "Delete postInterest query Internal Server Error",
-        //                Error = ex,
-        //            };
-        //            return StatusCode(500, response);
-        //        }
-        //    }
+        [HttpDelete("delete-post-interest")]
+        public IActionResult DeletePostInterestByIdAsync(Guid postInterestId)
+        {
+            try
+            {
+                _postService.DeleteInteresterByIdAsync(postInterestId);
+                var response = new
+                {
+                    StatusCode = 204,
+                    Message = "Delete postInterest query was successful",
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var response = new
+                {
+                    StatusCode = 500,
+                    Message = "Delete postInterest query Internal Server Error",
+                    Error = ex,
+                };
+                return StatusCode(500, response);
+            }
+        }
     }
 }

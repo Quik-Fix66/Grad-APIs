@@ -27,6 +27,8 @@ namespace APIs.Services.Interfaces
 
         Task<string> GetOldVideoPathAsync(Guid postId);
 
+        Task<bool> IsTradePostAsync(Guid postId);
+
         ////---------------------------------------------COMMENT-------------------------------------------------------//
 
         Task<PagedList<CommentDetailsDTO>> GetCommentByPostIdAsync(Guid postId, PagingParams @params);
@@ -43,12 +45,12 @@ namespace APIs.Services.Interfaces
 
         ////---------------------------------------------POSTINTEREST-------------------------------------------------------//
 
-        //public PagedList<PostInterest> GetPostInterestByPostId(Guid postId, PagingParams @params);
+        Task<int> AddNewInteresterAsync(PostInterester postInterest);
 
-        //public int AddNewPostInterest(PostInterest postInterest);
+        int UpdateInterester(PostInterester postInterest);
 
-        //public int UpdatePostInterest(PostInterest PostInterest);
+        Task<int> DeleteInteresterByIdAsync(Guid postInterestId);
 
-        //public int DeletePostInterestById(Guid postInterestId);
+        Task<PagedList<PostInterester>> GetInteresterByPostIdAsync(Guid postId, PagingParams @params);
     }
 }

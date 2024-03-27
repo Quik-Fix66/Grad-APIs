@@ -47,7 +47,7 @@ namespace BusinessObjects
         //Trading services DbSets
         public virtual DbSet<Post> Posts { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
-        public virtual DbSet<PostInterest> PostInterests { get; set; }
+        public virtual DbSet<PostInterester> PostInteresters { get; set; }
         public virtual DbSet<PostComment> PostComments { get; set; }
         //public virtual DbSet<TradeDetail> TradeDetails { get; set; }
 
@@ -115,13 +115,13 @@ namespace BusinessObjects
             .WithOne()
             .HasForeignKey<Work>(w => w.StatId);
 
-              builder.Entity<PostInterest>()
+              builder.Entity<PostInterester>()
             .HasOne(p => p.AppUser)
             .WithMany()
             .HasForeignKey(a => a.InteresterId)
             .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<PostInterest>()
+            builder.Entity<PostInterester>()
             .HasOne(p => p.Post)
             .WithMany()
             .HasForeignKey(a => a.PostId)
