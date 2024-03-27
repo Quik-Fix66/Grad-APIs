@@ -35,6 +35,7 @@ namespace DataAccess.DAO.E_com
                     return await _context.SaveChangesAsync();
                 } return 0;
         }
+
         //Delete post by id
         public async Task<int> DeletePostByIdAsync(Guid postId)
         {

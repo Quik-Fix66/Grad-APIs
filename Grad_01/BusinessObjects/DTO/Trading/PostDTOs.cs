@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessObjects.Models.E_com.Trading;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,14 @@ namespace BusinessObjects.DTO.Trading
         public bool IsTradePost { get; set; }
         //public List<string> CateId { get; set; } = null!;
     }
+
+    public class PostDetailsDTO
+    {
+        public Post PostData { get; set; } = null!;
+        public string Username { get; set; } = null!;
+        public string? AvatarDir { get; set; }
+    }
+    
 
     //-------------------------------------------------COMMENT-----------------------------------------------------//
 

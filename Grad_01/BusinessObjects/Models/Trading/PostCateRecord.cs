@@ -1,19 +1,22 @@
-﻿//using System;
-//using System.ComponentModel.DataAnnotations;
-//using BusinessObjects.Models.E_com.Trading;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using BusinessObjects.Models.E_com.Trading;
+using Newtonsoft.Json;
 
-//namespace BusinessObjects.Models.Trading
-//{
-//	public class PostCateRecord
-//	{
-//		[Key]
-//		public Guid Id { get; set; }
-//		public Guid CateId { get; set; }
-//		public Guid PostId { get; set; }
+namespace BusinessObjects.Models.Trading
+{
+	public class PostCateRecord
+	{
+		[Key]
+		public Guid Id { get; set; }
+		public Guid CateId { get; set; }
+		public Guid PostId { get; set; }
 
-//		[ForeignKey("CateI")]
-//		Category Cate { get; set; } = null!;
-//		private Post Post { get; set; } = null!;
-//	}
-//}
+		[ForeignKey("CateId"), JsonIgnore]
+		public Category Cate { get; set; } = null!;
+        [ForeignKey("PostId"), JsonIgnore]
+        public Post Post { get; set; } = null!;
+	}
+}
 

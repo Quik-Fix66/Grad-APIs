@@ -1,12 +1,5 @@
 ﻿using BusinessObjects.Models.Trading;
 using BusinessObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessObjects.Models.E_com.Trading;
-using BusinessObjects.Models.Creative;
 
 namespace DataAccess.DAO.Trading
 {

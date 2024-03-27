@@ -31,6 +31,21 @@ namespace APIs.Controllers
         {
                 var posts = await _postService.GetAllPostAsync(@params);
 
+                List<PostDetailsDTO> result = new List<PostDetailsDTO>();
+                foreach(var p in posts)
+                {
+                   var user = await _accountService.FindUserByIdAsync(p.UserId);
+                   if(user != null)
+                    {
+                    result.Add(new PostDetailsDTO
+                    {
+                        PostData = p,
+                        Username = user.Username,
+                        AvatarDir = user.AvatarDir
+                    });
+                    }
+                }
+
                 if (posts != null)
                 {
                     var metadata = new
@@ -43,7 +58,7 @@ namespace APIs.Controllers
                         posts.HasPrevious
                     };
                     Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-                    return Ok(posts);
+                    return Ok(result);
                 }
                 else return BadRequest("No chapter!!!");
         }

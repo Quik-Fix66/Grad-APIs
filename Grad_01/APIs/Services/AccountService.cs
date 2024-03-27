@@ -18,6 +18,7 @@ namespace APIs.Repositories.Interfaces
         private readonly IConfiguration _config;
 
         private readonly AccountDAO _accountDAO;
+        private readonly RoleRecordDAO _roleRecordDAO;
         private readonly RoleDAO _roleDAO;
         private readonly RefreshTokenDAO _refreshTokenDAO;
 
@@ -25,6 +26,7 @@ namespace APIs.Repositories.Interfaces
         {
             _config = config;
             _roleDAO = new RoleDAO();
+            _roleRecordDAO = new RoleRecordDAO();
             _accountDAO = new AccountDAO();
             _refreshTokenDAO = new RefreshTokenDAO();
         }
@@ -48,6 +50,7 @@ namespace APIs.Repositories.Interfaces
                 IsValidated = false,
             };
             await _accountDAO.CreateAccount(user);
+            await _roleRecordDAO.AddNewRoleRecordAsync(user.UserId,Guid.Parse("2da9143d-559c-40b5-907d-0d9c8d714c6c"));
             return user;
         }
 
@@ -85,7 +88,7 @@ namespace APIs.Repositories.Interfaces
                 issuer: "Book connect",
                 audience: "Pikachu",
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(1),
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: cred
                 );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
