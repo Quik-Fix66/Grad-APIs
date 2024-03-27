@@ -7,6 +7,7 @@ using BusinessObjects.Models.Ecom;
 using BusinessObjects.Models.Ecom.Base;
 using BusinessObjects.Models.Ecom.Payment;
 using BusinessObjects.Models.Ecom.Rating;
+using BusinessObjects.Models.Trading;
 using BusinessObjects.Models.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,13 +28,12 @@ namespace BusinessObjects
         public virtual DbSet<Order> Orders { get; set; } 
         public virtual DbSet<Book> Books { get; set; }
         public virtual DbSet<BanRecord> BanRecords { get; set; }
-        public virtual DbSet<Testing> Testings { get; set; }
+        public virtual DbSet<HeartRecord> HeartRecords { get; set; }
 
         //Subscribtion services DbSets
         public virtual DbSet<Tier> Tiers { get; set; } 
         public virtual DbSet<Subscription> Subscriptions { get; set; } 
         public virtual DbSet<SubRecord> SubRecords { get; set; } 
-
 
         //Rating services DbSets
         public virtual DbSet<Rating> Ratings { get; set; }
@@ -45,7 +45,11 @@ namespace BusinessObjects
         //public virtual Db
 
         //Trading services DbSets
-        public virtual DbSet<Post> Posts { get; set; } 
+        public virtual DbSet<Post> Posts { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<PostInterest> PostInterests { get; set; }
+        public virtual DbSet<PostComment> PostComments { get; set; }
+        //public virtual DbSet<TradeDetail> TradeDetails { get; set; }
 
         //Utility DbSets
         public virtual DbSet<Role> Roles { get; set; }
@@ -59,8 +63,7 @@ namespace BusinessObjects
 
         //Creative services DbSet
         public virtual DbSet<Chapter> Chapters { get; set; } 
-        public virtual DbSet<Work> Works { get; set; } 
-
+        public virtual DbSet<Work> Works { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -69,6 +72,8 @@ namespace BusinessObjects
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot config = builder.Build();
             optionsBuilder.UseSqlServer(config.GetConnectionString("Default"));
+            optionsBuilder.EnableSensitiveDataLogging(); //for: The instance of entity type ? cannot be tracked because another instance with the same key value
+                                                         //for ? is already being tracked. 
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -80,6 +85,7 @@ namespace BusinessObjects
                     Description = "Role for base user?"
                 }
                 );
+
             base.OnModelCreating(builder); 
             builder.Entity<SubRecord>()
            .HasOne(sr => sr.Subscription)
@@ -109,6 +115,35 @@ namespace BusinessObjects
             .WithOne()
             .HasForeignKey<Work>(w => w.StatId);
 
+              builder.Entity<PostInterest>()
+            .HasOne(p => p.AppUser)
+            .WithMany()
+            .HasForeignKey(a => a.InteresterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PostInterest>()
+            .HasOne(p => p.Post)
+            .WithMany()
+            .HasForeignKey(a => a.PostId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Comment>()
+            .HasOne(p => p.AppUser)
+            .WithMany()
+            .HasForeignKey(a => a.CommenterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<HeartRecord>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<HeartRecord>()
+            .HasOne(r => r.Post)
+            .WithMany()
+            .HasForeignKey(a => a.PostId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

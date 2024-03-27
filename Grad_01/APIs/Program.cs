@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using APIs.Config;
 using APIs.Repositories;
 using APIs.Repositories.Interfaces;
@@ -38,6 +38,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IWorkService, WorkService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
@@ -46,7 +47,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
-builder.Services.AddScoped<ITestService, TestService>();
+//builder.Services.AddScoped<ITestService, TestService>();
 
 //Repositories
 builder.Services.AddScoped<ICartRepository, CartRepository>();

@@ -13,6 +13,7 @@ namespace BusinessObjects.Models
 		public string Email { get; set; } = null!;
 		public string Password { get; set; } = null!;
 		public string Salt { get; set; } = null!;
+		public string? AvatarDir { get; set; }
 		public bool IsValidated { get; set; } = false;
 		public bool IsBanned { get; set; } = false;
 	}

@@ -75,7 +75,6 @@ namespace DataAccess.DAO
 						AgencyName = agency.AgencyName
 					};
 				} return result;
-              
 			}
 			catch(Exception e)
 			{
@@ -187,7 +186,6 @@ namespace DataAccess.DAO
 					foreach(Guid i in bookIds)
 					{
 						listBooks.Add(context.Books.Where(b => b.ProductId == i).FirstOrDefault());
-						
 					}
 					return listBooks;
                 }
